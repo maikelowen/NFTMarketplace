@@ -1,10 +1,20 @@
 /* pages/_app.js */
 import '../styles/globals.css'
 import Link from 'next/link'
+import Layout from '../components/Layout'
 
 function MyApp({ Component, pageProps }) {
   return (
-    <div>
+    <Layout>
+          <Component {...pageProps} />
+    </Layout>
+  )
+}
+
+export default MyApp
+
+
+/*     <div>
       <nav className="border-b p-6">
         <p className="text-4xl font-bold">Metaverse Marketplace</p>
         <div className="flex mt-4">
@@ -31,8 +41,4 @@ function MyApp({ Component, pageProps }) {
         </div>
       </nav>
       <Component {...pageProps} />
-    </div>
-  )
-}
-
-export default MyApp
+    </div> */
