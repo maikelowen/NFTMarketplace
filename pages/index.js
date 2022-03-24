@@ -64,7 +64,6 @@ export default function Home() {
 
     loadNFTs()
   }
-  if (loadingState === 'loaded' && !nfts.length) return (<h1 className="px-20 py-10 text-3xl">No items in marketplace</h1>)
   return (
     <div className="flex justify-center">
       <div className="px-4" style={{ maxWidth: '1600px' }}>
@@ -72,7 +71,7 @@ export default function Home() {
         <Hero/>
       </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4">
-          {
+        {nfts.length ? (           
             nfts.map((nft, i) => (
               <div key={i} className="border shadow rounded-xl overflow-hidden">
                 <img src={nft.image} />
@@ -88,7 +87,10 @@ export default function Home() {
                 </div>
               </div>
             ))
-          }
+                ) : (
+                <div>No items in the marketplace</div>
+              )}
+         
         </div>
       </div>
     </div>
