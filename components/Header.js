@@ -3,8 +3,10 @@ import Link from 'next/link'
 import React from 'react'
 import { AiOutlineSearch } from 'react-icons/ai'
 import { CgProfile } from 'react-icons/cg'
-import { ethers } from "ethers"
-import { useState } from 'react'
+import { ethers, Signer } from "ethers"
+import { useState, useEffect } from 'react'
+import { client } from '../nftmarketplacesanity/lib/sanityClient'
+import toast, { Toaster } from 'react-hot-toast'
 
 import {
     nftaddress, nftmarketaddress
@@ -51,7 +53,6 @@ function MobileNav({open, setOpen}) {
                 <a className="text-xl font-normal my-4" href="/dashboard" onClick={() => setTimeout(() => {setOpen(!open)}, 100)}>
                     Dashboard
                 </a>
-                
             </div>  
         </div>
     )
@@ -62,6 +63,7 @@ export default function Header() {
     const [loading, setLoading] = useState(true)
     const [open, setOpen] = useState(false)
     const [account, setAccount] = useState()
+    const [id, setId] = useState()
     const [nft, setNFT] = useState({})
     const [marketplace, setMarketplace] = useState({})
     // MetaMask Login/Connect
@@ -96,8 +98,46 @@ export default function Header() {
         console.log(marketplace)
       }
 
+
+    useEffect(() => {
+        if (!account) return
+        ;(async () => {
+            const userDoc = {
+                _type: 'users',
+                _id: account,
+                userName: 'Unnamed',
+                walletAddress: account,
+            }
+        
+            const result = await client.createIfNotExists(userDoc)
+        
+            welcomeUser(result.userName)
+        })()
+    }, [account])  
+
+
+    const welcomeUser = (userName, toastHandler = toast) => {
+        console.log("entrando en welcomeUser")
+        toastHandler.success(
+          `Welcome back${userName !== 'Unnamed' ? ` ${userName}` : ''}!`,
+          {
+            style: {
+              background: '#04111d',
+              color: '#fff',
+            },
+          }
+        )
+        console.log("saliendo de welcomeUser")
+
+      }
+    
+
     return (
         <nav className="flex filter drop-shadow-md bg-white px-4 py-4 h-20 items-center">
+            <Toaster
+                position="top-center"
+                reverseOrder={false}
+             />
             <MobileNav open={open} setOpen={setOpen}/>
             <div className="w-3/12 flex items-center text-2xl font-semibold">
                 <Link href="/">
