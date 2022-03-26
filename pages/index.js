@@ -15,12 +15,12 @@ import Market from '../artifacts/contracts/NFTMarket.sol/NFTMarket.json'
 export default function Home() {
   const [nfts, setNfts] = useState([])
   const [loadingState, setLoadingState] = useState('not-loaded')
-  useEffect(() => {
+    useEffect(() => {
     loadNFTs()
-  }, [])
-  async function loadNFTs() {
+    }, [])
+    async function loadNFTs() {
     /* create a generic provider and query for unsold market items */
-    const provider = new ethers.providers.JsonRpcProvider()
+    const provider = new ethers.providers.JsonRpcProvider("https://rpc-mumbai.matic.today")
     const tokenContract = new ethers.Contract(nftaddress, NFT.abi, provider)
     const marketContract = new ethers.Contract(nftmarketaddress, Market.abi, provider)
     const data = await marketContract.fetchMarketItems()
@@ -48,7 +48,7 @@ export default function Home() {
     setNfts(items)
     setLoadingState('loaded') 
   }
-  async function buyNft(nft) {
+    async function buyNft(nft) {
     /* needs the user to sign the transaction, so will use Web3Provider and sign it */
     const web3Modal = new Web3Modal()
     const connection = await web3Modal.connect()
@@ -64,6 +64,7 @@ export default function Home() {
 
     loadNFTs()
   }
+
   return (
     <div className="flex justify-center">
       <div className="px-4" style={{ maxWidth: '1600px' }}>
@@ -90,7 +91,6 @@ export default function Home() {
                 ) : (
                 <div>No items in the marketplace</div>
               )}
-         
         </div>
       </div>
     </div>
