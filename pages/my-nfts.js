@@ -5,13 +5,12 @@ import Web3Modal from 'web3modal'
 import { useRouter } from 'next/router'
 
 import {
-    nftaddress, nftmarketaddress
-  } from '../config'
+  marketplaceAddress
+} from '../config'
 
-import NFT from '../artifacts/contracts/NFT.sol/NFT.json'
-import Market from '../artifacts/contracts/NFTMarket.sol/NFTMarket.json'
-  
-export default function MyNFTs() {
+import NFTMarketplace from '../artifacts/contracts/NFTMarketplace.sol/NFTMarketplace.json'
+
+export default function MyAssets() {
   const [nfts, setNfts] = useState([])
   const [loadingState, setLoadingState] = useState('not-loaded')
   const router = useRouter()
@@ -19,18 +18,19 @@ export default function MyNFTs() {
     loadNFTs()
   }, [])
   async function loadNFTs() {
-    const web3Modal = new Web3Modal()
+    const web3Modal = new Web3Modal({
+      network: "mainnet",
+      cacheProvider: true,
+    })
     const connection = await web3Modal.connect()
     const provider = new ethers.providers.Web3Provider(connection)
     const signer = provider.getSigner()
 
-    const marketContract = new ethers.Contract(nftmarketaddress, Market.abi, signer)
-    const tokenContract = new ethers.Contract(nftaddress, NFT.abi, provider)
-
-    const data = await marketContract.fetchMyNFTs()
+    const marketplaceContract = new ethers.Contract(marketplaceAddress, NFTMarketplace.abi, signer)
+    const data = await marketplaceContract.fetchMyNFTs()
 
     const items = await Promise.all(data.map(async i => {
-      const tokenURI = await tokenContract.tokenURI(i.tokenId)
+      const tokenURI = await marketplaceContract.tokenURI(i.tokenId)
       const meta = await axios.get(tokenURI)
       let price = ethers.utils.formatUnits(i.price.toString(), 'ether')
       let item = {
@@ -46,10 +46,10 @@ export default function MyNFTs() {
     setNfts(items)
     setLoadingState('loaded') 
   }
-  /* function listNFT(nft) {
+  function listNFT(nft) {
     console.log('nft:', nft)
     router.push(`/resell-nft?id=${nft.tokenId}&tokenURI=${nft.tokenURI}`)
-  } */
+  }
   if (loadingState === 'loaded' && !nfts.length) return (<h1 className="py-10 px-20 text-3xl">No NFTs owned</h1>)
   return (
     <div className="flex justify-center">
